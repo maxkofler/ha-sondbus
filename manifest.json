@@ -1,12 +1,9 @@
 {
   "domain": "sondbus",
   "name": "Sondbus",
-  "codeowners": [
-    "@maxkofler"
-  ],
+  "codeowners": ["@maxkofler"],
   "config_flow": true,
   "documentation": "https://www.home-assistant.io/integrations/sondbus",
   "iot_class": "local_polling",
-  "quality_scale": "bronze",
-  "requirements": []
+  "requirements": ["crc==7.1", "pyserial==3.5"]
 }
