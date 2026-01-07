@@ -1,6 +1,7 @@
 {
   "domain": "sondbus",
   "name": "Sondbus",
+  "version": "1.0.0",
   "codeowners": ["@maxkofler"],
   "config_flow": true,
   "documentation": "https://www.home-assistant.io/integrations/sondbus",
