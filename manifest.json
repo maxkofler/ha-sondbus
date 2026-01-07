@@ -5,12 +5,8 @@
     "@maxkofler"
   ],
   "config_flow": true,
-  "dependencies": [],
   "documentation": "https://www.home-assistant.io/integrations/sondbus",
-  "homekit": {},
   "iot_class": "local_polling",
   "quality_scale": "bronze",
-  "requirements": [],
-  "ssdp": [],
-  "zeroconf": []
+  "requirements": []
 }
