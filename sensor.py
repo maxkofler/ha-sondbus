@@ -19,7 +19,7 @@ from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
 from . import sondbus
 
-SCAN_INTERVAL = timedelta(seconds=5)
+SCAN_INTERVAL = timedelta(seconds=10)
 
 
 def setup_platform(
@@ -29,23 +29,18 @@ def setup_platform(
     discovery_info: DiscoveryInfoType | None = None,
 ) -> None:
     """Set up the sensor platform."""
-    connection = serial.Serial("/dev/ttyACM0", baudrate=1000000)
 
-    add_entities([ExampleSensor(connection)])
+    add_entities([VorlaufSensor()])
 
 
-class ExampleSensor(SensorEntity):
+class VorlaufSensor(SensorEntity):
     """Representation of a Sensor."""
 
-    _attr_name = "Example Temperature"
+    _attr_name = "Temperatur Vorlauf"
     _attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
     _attr_device_class = SensorDeviceClass.TEMPERATURE
     _attr_state_class = SensorStateClass.MEASUREMENT
-
-    def __init__(self, connection: serial.Serial) -> None:
-        super().__init__()
-
-        self.bus = sondbus.Master(connection)
+    unique_id = "vorlauf"
 
     def update(self) -> None:
         """Fetch new state data for the sensor.
@@ -53,10 +48,40 @@ class ExampleSensor(SensorEntity):
         This is the only method that should fetch new data for Home Assistant.
         """
 
-        for _ in range(100):
-            self.bus.sync()
+        connection = serial.Serial("/dev/ttyACM0", baudrate=1000000)
+        bus = sondbus.Master(connection)
 
-        data = self.bus.read_logical(0, 0, 4)
+        for _ in range(100):
+            bus.sync()
+
+        data = bus.read_logical(0, 0, 4)
+        value = struct.unpack("<f", data)[0]
+
+        self._attr_native_value = value
+
+
+class RuecklaufSensor(SensorEntity):
+    """Representation of a Sensor."""
+
+    _attr_name = "Temperatur Ruecklauf"
+    _attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
+    _attr_device_class = SensorDeviceClass.TEMPERATURE
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    unique_id = "ruecklauf"
+
+    def update(self) -> None:
+        """Fetch new state data for the sensor.
+
+        This is the only method that should fetch new data for Home Assistant.
+        """
+
+        connection = serial.Serial("/dev/ttyACM0", baudrate=1000000)
+        bus = sondbus.Master(connection)
+
+        for _ in range(100):
+            bus.sync()
+
+        data = bus.read_logical(0, 4, 4)
         value = struct.unpack("<f", data)[0]
 
         self._attr_native_value = value
