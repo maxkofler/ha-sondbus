@@ -20,6 +20,7 @@ from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from . import sondbus
 
 SCAN_INTERVAL = timedelta(seconds=10)
+SERIAL_PORT = "/dev/ttyACM0"
 
 
 def setup_platform(
@@ -30,7 +31,7 @@ def setup_platform(
 ) -> None:
     """Set up the sensor platform."""
 
-    add_entities([VorlaufSensor()])
+    add_entities([VorlaufSensor(), RuecklaufSensor()])
 
 
 class VorlaufSensor(SensorEntity):
@@ -40,7 +41,7 @@ class VorlaufSensor(SensorEntity):
     _attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
     _attr_device_class = SensorDeviceClass.TEMPERATURE
     _attr_state_class = SensorStateClass.MEASUREMENT
-    unique_id = "vorlauf"
+    unique_id = "sensor.sondbus_vorlauf"
 
     def update(self) -> None:
         """Fetch new state data for the sensor.
@@ -48,7 +49,7 @@ class VorlaufSensor(SensorEntity):
         This is the only method that should fetch new data for Home Assistant.
         """
 
-        connection = serial.Serial("/dev/ttyACM0", baudrate=1000000)
+        connection = serial.Serial(SERIAL_PORT, baudrate=1000000)
         bus = sondbus.Master(connection)
 
         for _ in range(100):
@@ -67,7 +68,7 @@ class RuecklaufSensor(SensorEntity):
     _attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
     _attr_device_class = SensorDeviceClass.TEMPERATURE
     _attr_state_class = SensorStateClass.MEASUREMENT
-    unique_id = "ruecklauf"
+    unique_id = "sensor.sondbus_ruecklauf"
 
     def update(self) -> None:
         """Fetch new state data for the sensor.
@@ -75,7 +76,7 @@ class RuecklaufSensor(SensorEntity):
         This is the only method that should fetch new data for Home Assistant.
         """
 
-        connection = serial.Serial("/dev/ttyACM0", baudrate=1000000)
+        connection = serial.Serial(SERIAL_PORT, baudrate=1000000)
         bus = sondbus.Master(connection)
 
         for _ in range(100):
