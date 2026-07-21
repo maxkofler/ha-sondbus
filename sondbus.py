@@ -50,36 +50,34 @@ class Master:
 
     def sync(self):
         data = bytearray()
-        data.extend([START_BYTE, self.make_cmd(CMD_SYNC)])
+        data.append(self.make_cmd(CMD_SYNC))
         data.extend(SYNC_SEQUENCE)
         data.append(1)
         data.append(calc_crc(data))
 
         self.port.write(data)
 
-    def read_logical(self, slave: int, offset: int, len: int) -> bytes:
-        slave = slave & 0xFFFF
-        len = len & 0xFFFF
-        offset = offset & 0xFFFF
+    def read_broadcast(self, offset: int, length: int) -> bytes:
+        length = length & 0xFF
+        offset = offset & 0xFF
 
-        cmd_byte = 0 | 1 << 5 | 1 << 4 | 1 << 3 | 2 << 1 | 0 << 0
+        cmd_byte = 0 | 1 << 5 
 
         data = bytearray()
-        data.extend([START_BYTE, self.make_cmd(cmd_byte)])
-        data.extend(struct.pack(">H", slave))
-        data.extend(struct.pack(">H", offset))
-        data.extend(struct.pack(">H", len))
+        data.append(self.make_cmd(cmd_byte))
+        data.extend(struct.pack(">B", offset))
+        data.extend(struct.pack(">B", length))
         data.append(calc_crc(data))
 
         self.port.write(data)
 
-        rx = self.port.read(len + 1)
+        rx = self.port.read(length + 1)
 
         payload = rx[:-1]
         data.extend(payload)
 
         calced_crc = calc_crc(data)
-        crc = rx[len]
+        crc = rx[length]
 
         if crc != calced_crc:
             raise CRCError

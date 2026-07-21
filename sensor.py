@@ -54,7 +54,7 @@ class VorlaufSensor(SensorEntity):
         for _ in range(100):
             bus.sync()
 
-        data = bus.read_logical(0, 0, 4)
+        data = bus.read_broadcast(0, 4)
         value = struct.unpack("<f", data)[0]
 
         self._attr_native_value = value
@@ -81,7 +81,7 @@ class RuecklaufSensor(SensorEntity):
         for _ in range(100):
             bus.sync()
 
-        data = bus.read_logical(0, 4, 4)
+        data = bus.read_broadcast(4, 4)
         value = struct.unpack("<f", data)[0]
 
         self._attr_native_value = value
